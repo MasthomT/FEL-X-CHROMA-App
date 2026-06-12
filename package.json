@@ -1,11 +1,11 @@
 {
   "name": "chroma-key-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Suppression de fond vert avec export WebM transparent",
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MasthomT/FEL-X-CHROMA-App"
+    "url": "https://github.com/MasthomT/FEL-X-CHROMA-App.git"
   },
   "scripts": {
     "start": "electron .",
@@ -14,8 +14,8 @@
     "build:linux": "electron-builder --linux"
   },
   "build": {
-    "appId": "com.masthom.chromakey",
     "productName": "FEL-X CHROMA App",
+    "appId": "com.masthom.chromakey",
     "publish": [
       {
         "provider": "github",

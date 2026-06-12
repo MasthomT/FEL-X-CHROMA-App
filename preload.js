@@ -5,5 +5,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   maximizeWindow: () => ipcRenderer.invoke('maximize-window'),
   closeWindow: () => ipcRenderer.invoke('close-window'),
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
-  saveVideo: (arrayBuffer) => ipcRenderer.invoke('save-video', arrayBuffer)
+  saveVideo: (arrayBuffer, defaultName) => ipcRenderer.invoke('save-video', arrayBuffer, defaultName)
 })

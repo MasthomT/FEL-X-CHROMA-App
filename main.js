@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
-// const { autoUpdater } = require('electron-updater') // À décommenter pour les MAJ auto
+const { autoUpdater } = require('electron-updater')
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -24,21 +24,19 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow()
-  // autoUpdater.checkForUpdatesAndNotify() // À décommenter pour les MAJ auto
+  autoUpdater.checkForUpdatesAndNotify()
 })
 
-/* À décommenter pour les MAJ auto
 autoUpdater.on('update-downloaded', () => {
   dialog.showMessageBox({
     type: 'info',
     title: 'Mise à jour prête',
-    message: 'Une nouvelle version a été téléchargée. L\'application va redémarrer.',
+    message: 'Une nouvelle version de FEL-X CHROMA App a été téléchargée en arrière-plan. L\'application va redémarrer pour l\'installer.',
     buttons: ['Redémarrer maintenant']
   }).then(() => {
     autoUpdater.quitAndInstall()
   })
 })
-*/
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
@@ -48,7 +46,6 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
-// -- Gestion des IPC --
 ipcMain.handle('minimize-window', () => {
   BrowserWindow.getFocusedWindow()?.minimize()
 })
@@ -70,11 +67,10 @@ ipcMain.handle('open-file-dialog', async () => {
   return result.filePaths[0] || null
 })
 
-// -- NOUVEAU : Sauvegarde de la vidéo --
-ipcMain.handle('save-video', async (event, arrayBuffer) => {
+ipcMain.handle('save-video', async (event, arrayBuffer, defaultName) => {
   const { canceled, filePath } = await dialog.showSaveDialog({
     title: 'Enregistrer la vidéo',
-    defaultPath: 'chroma-key-export.webm',
+    defaultPath: defaultName || 'chroma-key-export.webm',
     buttonLabel: 'Enregistrer',
     filters: [
       { name: 'Vidéos WebM', extensions: ['webm'] }

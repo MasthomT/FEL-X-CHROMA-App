@@ -2,101 +2,96 @@
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8">
-			<title>Chroma Key</title>
-			<style>
-				*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-				:root {
-				--bg: #0e0e0f; --surface: #161618; --panel: #1c1c1f;
-				--border: rgba(255,255,255,0.07); --border-md: rgba(255,255,255,0.12);
-				--text: #f0f0f0; --muted: #6b6b72;
-				--accent: #7c6fcd; --accent-glow: rgba(124,111,205,0.18); --accent-dim: rgba(124,111,205,0.08);
-				--green: #3ecf8e; --red: #e05c5c;
-				--r: 10px; --rl: 14px;
-				}
-				html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 13px; }
+		<title>Chroma Key</title>
+		<style>
+			*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+			:root {
+			--bg: #0e0e0f; --surface: #161618; --panel: #1c1c1f;
+			--border: rgba(255,255,255,0.07); --border-md: rgba(255,255,255,0.12);
+			--text: #f0f0f0; --muted: #6b6b72;
+			--accent: #7c6fcd; --accent-glow: rgba(124,111,205,0.18); --accent-dim: rgba(124,111,205,0.08);
+			--green: #3ecf8e; --red: #e05c5c;
+			--r: 10px; --rl: 14px;
+			}
+			html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 13px; }
 
-				#titlebar { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; -webkit-app-region: drag; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
-				.tb-brand { display: flex; align-items: center; gap: 10px; -webkit-app-region: no-drag; }
-				.brand-logo {
-				width: 18px;
-				height: 18px;
-				object-fit: contain;
-				/* Optionnel : border-radius: 4px; si ton logo n'est pas déjà rond/détouré */
-				}
-				.brand-name { font-size: 13px; font-weight: 600; letter-spacing: .04em; }
-				.brand-ver { font-size: 10px; color: var(--muted); margin-left: 2px; }
-				.tb-wm { display: flex; gap: 6px; -webkit-app-region: no-drag; }
-				.wm-btn { width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
-				.wm-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
-				.wm-btn.close:hover { background: rgba(224,92,92,0.2); color: var(--red); }
+			#titlebar { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; -webkit-app-region: drag; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
+			.tb-brand { display: flex; align-items: center; gap: 10px; -webkit-app-region: no-drag; }
+			.brand-logo {
+			width: 18px;
+			height: 18px;
+			object-fit: contain;
+			}
+			.brand-name { font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+			.brand-ver { font-size: 10px; color: var(--muted); margin-left: 2px; }
+			.tb-wm { display: flex; gap: 6px; -webkit-app-region: no-drag; }
+			.wm-btn { width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
+			.wm-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+			.wm-btn.close:hover { background: rgba(224,92,92,0.2); color: var(--red); }
 
-				#app { display: flex; height: calc(100vh - 44px); }
+			#app { display: flex; height: calc(100vh - 44px); }
 
-				#sidebar { width: 260px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px; gap: 8px; overflow-y: auto; }
-				.slabel { font-size: 10px; font-weight: 600; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; padding: 8px 4px 4px; }
+			#sidebar { width: 260px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px; gap: 8px; overflow-y: auto; overflow-x: hidden; }
+			.slabel { font-size: 10px; font-weight: 600; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; padding: 8px 4px 4px; }
 
-				#drop-zone { border: 1.5px dashed var(--border-md); border-radius: var(--rl); padding: 20px 12px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; background: var(--accent-dim); }
-				#drop-zone:hover, #drop-zone.drag-over { border-color: var(--accent); background: var(--accent-glow); }
-				#drop-zone svg { display: block; margin: 0 auto 8px; opacity: .45; }
-				.dz1 { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
-				.dz2 { font-size: 11px; color: var(--muted); }
-				#file-name { font-size: 11px; color: var(--green); margin-top: 6px; word-break: break-all; display: none; }
+			#drop-zone { border: 1.5px dashed var(--border-md); border-radius: var(--rl); padding: 20px 12px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; background: var(--accent-dim); }
+			#drop-zone:hover, #drop-zone.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+			#drop-zone svg { display: block; margin: 0 auto 8px; opacity: .45; }
+			.dz1 { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+			.dz2 { font-size: 11px; color: var(--muted); }
+			#file-name { font-size: 11px; color: var(--green); margin-top: 6px; word-break: break-all; display: none; }
 
-				.cg { background: var(--panel); border-radius: var(--r); padding: 14px; border: 1px solid var(--border); }
-				.cr { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-				.cr:last-child { margin-bottom: 0; }
-				.cl { font-size: 11px; color: var(--muted); min-width: 70px; }
-				.cv { font-size: 11px; font-weight: 600; min-width: 28px; text-align: right; }
+			.cg { background: var(--panel); border-radius: var(--r); padding: 14px; border: 1px solid var(--border); }
+			.cr { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+			.cr:last-child { margin-bottom: 0; }
+			.cl { font-size: 11px; color: var(--muted); min-width: 70px; }
+			.cv { font-size: 11px; font-weight: 600; min-width: 28px; text-align: right; }
 
-				input[type=range] { flex: 1; -webkit-appearance: none; height: 3px; border-radius: 99px; background: var(--border-md); outline: none; cursor: pointer; }
-				input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); cursor: pointer; }
+			input[type=range] { flex: 1; -webkit-appearance: none; height: 3px; border-radius: 99px; background: var(--border-md); outline: none; cursor: pointer; }
+			input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); cursor: pointer; }
 
-				#color-swatch { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border-md); cursor: pointer; flex-shrink: 0; }
-				#color-input { display: none; }
-				#color-hex { font-size: 11px; color: var(--muted); font-family: monospace; }
+			#color-swatch { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border-md); cursor: pointer; flex-shrink: 0; }
+			#color-input { display: none; }
+			#color-hex { font-size: 11px; color: var(--muted); font-family: monospace; }
 
-				.btn { width: 100%; padding: 10px; border-radius: var(--r); border: none; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity .15s, transform .1s; }
-				.btn:active { transform: scale(0.98); }
-				.btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
-				.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 12px var(--accent-glow); }
-				.btn-primary:hover:not(:disabled) { opacity: .88; }
-				.btn-ghost { background: var(--panel); color: var(--text); border: 1px solid var(--border-md); }
-				.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
+			.btn { width: 100%; padding: 10px; border-radius: var(--r); border: none; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity .15s, transform .1s; }
+			.btn:active { transform: scale(0.98); }
+			.btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+			.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 12px var(--accent-glow); }
+			.btn-primary:hover:not(:disabled) { opacity: .88; }
+			.btn-ghost { background: var(--panel); color: var(--text); border: 1px solid var(--border-md); }
+			.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
 
-				#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-				#preview-area { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); overflow: hidden; }
-				.ppane { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-				.plabel { position: absolute; top: 12px; left: 14px; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); z-index: 2; background: rgba(14,14,15,0.75); padding: 3px 9px; border-radius: 99px; border: 1px solid var(--border); }
-				.pinner { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-				.pinner.ck {
-				background-image: linear-gradient(45deg,#1a1a1a 25%,transparent 25%), linear-gradient(-45deg,#1a1a1a 25%,transparent 25%), linear-gradient(45deg,transparent 75%,#1a1a1a 75%), linear-gradient(-45deg,transparent 75%,#1a1a1a 75%);
-				background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0; background-color: #131313;
-				}
-				video, canvas { max-width: 100%; max-height: 100%; display: block; }
-				.pempty { text-align: center; }
-				.pempty svg { opacity: .1; display: block; margin: 0 auto 12px; }
-				.pempty p { font-size: 12px; color: var(--muted); }
+			#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+			#preview-area { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); overflow: hidden; }
+			.ppane { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+			.plabel { position: absolute; top: 12px; left: 14px; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); z-index: 2; background: rgba(14,14,15,0.75); padding: 3px 9px; border-radius: 99px; border: 1px solid var(--border); }
+			.pinner { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+			.pinner.ck {
+			background-image: linear-gradient(45deg,#1a1a1a 25%,transparent 25%), linear-gradient(-45deg,#1a1a1a 25%,transparent 25%), linear-gradient(45deg,transparent 75%,#1a1a1a 75%), linear-gradient(-45deg,transparent 75%,#1a1a1a 75%);
+			background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0; background-color: #131313;
+			}
+			video, canvas { max-width: 100%; max-height: 100%; display: block; }
+			.pempty { text-align: center; }
+			.pempty svg { opacity: .1; display: block; margin: 0 auto 12px; }
+			.pempty p { font-size: 12px; color: var(--muted); }
 
-				#statusbar { height: 40px; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 16px; background: var(--surface); flex-shrink: 0; }
-				.sstat { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
-				.sdot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
-				.sdot.ready { background: var(--green); box-shadow: 0 0 4px var(--green); }
-				.sdot.working { background: var(--accent); box-shadow: 0 0 4px var(--accent); animation: pulse 1s infinite; }
-				@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-				#prog-track { width: 200px; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; display: none; }
-				#prog-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width .1s; }
-				#prog-pct { font-size: 11px; color: var(--accent); font-weight: 600; display: none; }
-			</style>
-		</head>
+			#statusbar { height: 40px; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 16px; background: var(--surface); flex-shrink: 0; }
+			.sstat { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+			.sdot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+			.sdot.ready { background: var(--green); box-shadow: 0 0 4px var(--green); }
+			.sdot.working { background: var(--accent); box-shadow: 0 0 4px var(--accent); animation: pulse 1s infinite; }
+			@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+			#prog-track { width: 200px; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; display: none; }
+			#prog-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width .1s; }
+			#prog-pct { font-size: 11px; color: var(--accent); font-weight: 600; display: none; }
+		</style>
+	</head>
 	<body>
 
 		<div id="titlebar">
 			<div class="tb-brand">
-				<div class="tb-brand">
-					<img src="assets/icon.png" class="brand-logo" alt="Logo">
-						<span class="brand-name">Chroma Key</span>
-						<span class="brand-ver">v1.0</span>
-					</div>
+				<img src="assets/icon.png" class="brand-logo" alt="Logo">
 				<span class="brand-name">FEL-X CHROMA</span>
 				<span class="brand-ver">v1.0</span>
 			</div>
@@ -131,47 +126,48 @@
 					<div class="dz1">Glisser une vidéo ici</div>
 					<div class="dz2">ou cliquer pour parcourir</div>
 					<div id="file-name"></div>
+					<button class="btn btn-ghost" id="btn-clear" style="margin-top:8px; display:none; padding: 6px; font-size: 11px;">🗑️ Effacer la vidéo</button>
 				</div>
 				<input type="file" id="file-input" accept="video/*">
 
-					<div class="slabel">Chroma key</div>
-					<div class="cg">
-						<div class="cr">
-							<span class="cl">Couleur</span>
-							<div style="display:flex;align-items:center;gap:8px;flex:1">
-								<div id="color-swatch"></div>
-								<input type="color" id="color-input" value="#00b140">
-									<span id="color-hex">#00b140</span>
-								</div>
+				<div class="slabel">Chroma key</div>
+				<div class="cg">
+					<div class="cr">
+						<span class="cl">Couleur</span>
+						<div style="display:flex;align-items:center;gap:8px;flex:1">
+							<div id="color-swatch"></div>
+							<input type="color" id="color-input" value="#00b140">
+							<span id="color-hex">#00b140</span>
 						</div>
-						<div class="cr">
-							<span class="cl">Tolérance</span>
-							<input type="range" id="tol" min="0" max="220" value="80" step="1">
-								<span class="cv" id="tol-val">80</span>
-							</div>
-						<div class="cr">
-							<span class="cl">Douceur</span>
-							<input type="range" id="soft" min="0" max="120" value="20" step="1">
-								<span class="cv" id="soft-val">20</span>
-							</div>
 					</div>
-
-					<div class="slabel">Export</div>
-					<button class="btn btn-primary" id="btn-process" disabled="">
-						<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-							<path d="M8 5v14l11-7z"/>
-						</svg>
-						Lancer le traitement
-					</button>
-					<button class="btn btn-ghost" id="btn-download" disabled="" style="margin-top:6px">
-						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-							<polyline points="7 10 12 15 17 10"/>
-							<line x1="12" y1="15" x2="12" y2="3"/>
-						</svg>
-						Télécharger WebM
-					</button>
+					<div class="cr">
+						<span class="cl">Tolérance</span>
+						<input type="range" id="tol" min="0" max="220" value="80" step="1">
+						<span class="cv" id="tol-val">80</span>
+					</div>
+					<div class="cr">
+						<span class="cl">Douceur</span>
+						<input type="range" id="soft" min="0" max="120" value="20" step="1">
+						<span class="cv" id="soft-val">20</span>
+					</div>
 				</div>
+
+				<div class="slabel">Export</div>
+				<button class="btn btn-primary" id="btn-process" disabled="">
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M8 5v14l11-7z"/>
+					</svg>
+					Lancer le traitement
+				</button>
+				<button class="btn btn-ghost" id="btn-download" disabled="" style="margin-top:6px">
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+						<polyline points="7 10 12 15 17 10"/>
+						<line x1="12" y1="15" x2="12" y2="3"/>
+					</svg>
+					Télécharger WebM
+				</button>
+			</div>
 
 			<div id="main">
 				<div id="preview-area">
@@ -185,7 +181,7 @@
 								</svg>
 								<p>Aucune vidéo importée</p>
 							</div>
-							<video id="src-video" muted="" playsinline="" loop="" style="display:none"></video>
+							<video id="src-video" playsinline="" loop="" style="display:none"></video>
 						</div>
 					</div>
 					<div class="ppane">
@@ -241,29 +237,57 @@
 			const progFill   = document.getElementById('prog-fill')
 			const progPct    = document.getElementById('prog-pct')
 			const fileName   = document.getElementById('file-name')
+			const btnClear   = document.getElementById('btn-clear')
 
 			let chromaRgb = { r: 0, g: 177, b: 64 }
 			let videoLoaded = false
 			let animFrame = null
 			let outputBlob = null
+			let originalFileName = 'chroma-key-export'
 
 			function setStatus(state, text) {
-			sdot.className = 'sdot' + (state ? ' ' + state : '')
-			stext.textContent = text
+				sdot.className = 'sdot' + (state ? ' ' + state : '')
+				stext.textContent = text
 			}
 			function setProgress(pct) {
-			progTrack.style.display = pct === null ? 'none' : 'block'
-			progPct.style.display   = pct === null ? 'none' : 'inline'
-			if (pct !== null) { progFill.style.width = pct + '%'; progPct.textContent = pct + '%' }
+				progTrack.style.display = pct === null ? 'none' : 'block'
+				progPct.style.display   = pct === null ? 'none' : 'inline'
+				if (pct !== null) { progFill.style.width = pct + '%'; progPct.textContent = pct + '%' }
+			}
+
+			btnClear.onclick = (e) => {
+				e.stopPropagation();
+				if (animFrame) cancelAnimationFrame(animFrame)
+				videoLoaded = false
+				outputBlob = null
+				
+				srcVideo.pause()
+				srcVideo.removeAttribute('src')
+				srcVideo.load()
+				
+				outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height)
+				
+				srcVideo.style.display = 'none'
+				outCanvas.style.display = 'none'
+				document.getElementById('src-empty').style.display = 'block'
+				document.getElementById('out-empty').style.display = 'block'
+				
+				btnProcess.disabled = true
+				btnDownload.disabled = true
+				fileName.style.display = 'none'
+				btnClear.style.display = 'none'
+				
+				setStatus('', 'En attente')
+				setProgress(null)
 			}
 
 			colorSwatch.style.background = colorInput.value
 			colorSwatch.onclick = () => colorInput.click()
 			colorInput.oninput = () => {
-			const h = colorInput.value
-			colorSwatch.style.background = h
-			colorHex.textContent = h
-			chromaRgb = { r: parseInt(h.slice(1,3),16), g: parseInt(h.slice(3,5),16), b: parseInt(h.slice(5,7),16) }
+				const h = colorInput.value
+				colorSwatch.style.background = h
+				colorHex.textContent = h
+				chromaRgb = { r: parseInt(h.slice(1,3),16), g: parseInt(h.slice(3,5),16), b: parseInt(h.slice(5,7),16) }
 			}
 
 			tolSlider.oninput  = () => document.getElementById('tol-val').textContent  = tolSlider.value
@@ -272,13 +296,13 @@
 			dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('drag-over') }
 			dropZone.ondragleave = () => dropZone.classList.remove('drag-over')
 			dropZone.ondrop = e => {
-			e.preventDefault(); dropZone.classList.remove('drag-over')
-			const f = e.dataTransfer.files[0]
-			if (f && f.type.startsWith('video/')) loadVideo(f)
+				e.preventDefault(); dropZone.classList.remove('drag-over')
+				const f = e.dataTransfer.files[0]
+				if (f && f.type.startsWith('video/')) loadVideo(f)
 			}
 			dropZone.onclick = async () => {
-			if (api) { const p = await api.openFileDialog(); if (p) loadVideoPath(p) }
-			else fileInput.click()
+				if (api) { const p = await api.openFileDialog(); if (p) loadVideoPath(p) }
+				else fileInput.click()
 			}
 			dropZone.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') dropZone.click() }
 			fileInput.onchange = () => { if (fileInput.files[0]) loadVideo(fileInput.files[0]) }
@@ -286,156 +310,178 @@
 			function loadVideo(file) { loadVideoPath(URL.createObjectURL(file), file.name) }
 
 			function loadVideoPath(url, name) {
-			srcVideo.src = url
-			srcVideo.style.display = 'block'
-			document.getElementById('src-empty').style.display = 'none'
-			srcVideo.onloadedmetadata = () => {
-			const scale = Math.min(1, 1280 / srcVideo.videoWidth)
-			outCanvas.width  = Math.round(srcVideo.videoWidth  * scale)
-			outCanvas.height = Math.round(srcVideo.videoHeight * scale)
-			outCanvas.style.display = 'block'
-			document.getElementById('out-empty').style.display = 'none'
-			videoLoaded = true
-			outputBlob = null
-			btnProcess.disabled = false
-			btnDownload.disabled = true
-			fileName.textContent = name || url.split('/').pop()
-			fileName.style.display = 'block'
-			setStatus('ready', 'Vidéo prête — ' + srcVideo.videoWidth + '×' + srcVideo.videoHeight)
-			setProgress(null)
-			srcVideo.play()
-			startPreview()
-			}
+				console.log("Tentative de chargement :", url);
+				srcVideo.src = url;
+				srcVideo.style.display = 'block';
+				document.getElementById('src-empty').style.display = 'none';
+
+				const loadTimeout = setTimeout(() => {
+					if (!videoLoaded) setStatus('error', 'Erreur : Temps de chargement expiré');
+				}, 5000);
+
+				srcVideo.onloadedmetadata = () => {
+					clearTimeout(loadTimeout);
+					console.log("Metadata chargée ! Taille :", srcVideo.videoWidth);
+					
+					const scale = Math.min(1, 1280 / srcVideo.videoWidth);
+					outCanvas.width  = Math.round(srcVideo.videoWidth  * scale);
+					outCanvas.height = Math.round(srcVideo.videoHeight * scale);
+					outCanvas.style.display = 'block';
+					document.getElementById('out-empty').style.display = 'none';
+					
+					videoLoaded = true;
+					btnProcess.disabled = false;
+					btnDownload.disabled = true;
+					
+					const fileBaseName = name || url.split('/').pop() || 'video'
+					const lastDot = fileBaseName.lastIndexOf('.')
+					originalFileName = lastDot !== -1 ? fileBaseName.substring(0, lastDot) : fileBaseName
+					
+					fileName.textContent = fileBaseName
+					fileName.style.display = 'block'
+					btnClear.style.display = 'inline-block'
+					
+					setStatus('ready', 'Vidéo prête — ' + srcVideo.videoWidth + '×' + srcVideo.videoHeight)
+					setProgress(null)
+					
+					srcVideo.play();
+					startPreview();
+				};
+
+				srcVideo.onerror = (e) => {
+					console.error("Erreur vidéo :", e);
+					setStatus('error', 'Format vidéo non supporté');
+				};
 			}
 
 			function applyChroma(imgData, tol, soft) {
-			const d = imgData.data
-			const { r: cr, g: cg, b: cb } = chromaRgb
-			const s = Math.max(1, soft)
-			for (let i = 0; i < d.length; i += 4) {
-    const dr = d[i]-cr, dg = d[i+1]-cg, db = d[i+2]-cb
-    const dist = Math.sqrt(dr*dr + dg*dg + db*db)
-    if (dist < tol)        d[i+3] = 0
-    else if (dist < tol+s) d[i+3] = Math.round(((dist-tol)/s)*255)
-  }
-  return imgData
-}
+				const d = imgData.data
+				const { r: cr, g: cg, b: cb } = chromaRgb
+				const s = Math.max(1, soft)
+				for (let i = 0; i < d.length; i += 4) {
+					const dr = d[i]-cr, dg = d[i+1]-cg, db = d[i+2]-cb
+					const dist = Math.sqrt(dr*dr + dg*dg + db*db)
+					if (dist < tol)        d[i+3] = 0
+					else if (dist < tol+s) d[i+3] = Math.round(((dist-tol)/s)*255)
+				}
+				return imgData
+			}
 
-const _tmp = document.createElement('canvas')
-const _tc  = _tmp.getContext('2d', { willReadFrequently: true })
+			const _tmp = document.createElement('canvas')
+			const _tc  = _tmp.getContext('2d', { willReadFrequently: true })
 
-function startPreview() {
-  if (animFrame) cancelAnimationFrame(animFrame)
-  const draw = () => {
-    if (videoLoaded && !srcVideo.paused && !srcVideo.ended) {
-		if (_tmp.width !== outCanvas.width) { _tmp.width = outCanvas.width; _tmp.height = outCanvas.height }
-		_tc.drawImage(srcVideo, 0, 0, outCanvas.width, outCanvas.height)
-		const img = _tc.getImageData(0, 0, outCanvas.width, outCanvas.height)
-		applyChroma(img, parseInt(tolSlider.value), parseInt(softSlider.value))
-		outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height)
-		outCtx.putImageData(img, 0, 0)
-		}
-		animFrame = requestAnimationFrame(draw)
-		}
-		animFrame = requestAnimationFrame(draw)
-		}
+			function startPreview() {
+				if (animFrame) cancelAnimationFrame(animFrame)
+				const draw = () => {
+					if (videoLoaded && !srcVideo.paused && !srcVideo.ended) {
+						if (_tmp.width !== outCanvas.width) { _tmp.width = outCanvas.width; _tmp.height = outCanvas.height }
+						_tc.drawImage(srcVideo, 0, 0, outCanvas.width, outCanvas.height)
+						const img = _tc.getImageData(0, 0, outCanvas.width, outCanvas.height)
+						applyChroma(img, parseInt(tolSlider.value), parseInt(softSlider.value))
+						outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height)
+						outCtx.putImageData(img, 0, 0)
+					}
+					animFrame = requestAnimationFrame(draw)
+				}
+				animFrame = requestAnimationFrame(draw)
+			}
 
-		btnProcess.onclick = async () => {
-		if (!videoLoaded) return
-		if (animFrame) cancelAnimationFrame(animFrame)
+			btnProcess.onclick = async () => {
+				if (!videoLoaded) return
+				if (animFrame) cancelAnimationFrame(animFrame)
 
-		btnProcess.disabled = true
-		btnDownload.disabled = true
-		setStatus('working', 'Initialisation...')
-		setProgress(0)
+				btnProcess.disabled = true
+				btnDownload.disabled = true
+				btnClear.disabled = true
+				setStatus('working', 'Initialisation...')
+				setProgress(0)
 
-		const dur = srcVideo.duration
+				const dur = srcVideo.duration
+				
+				const canvasStream = outCanvas.captureStream(30)
+				let finalStream = canvasStream
 
-		const stream = outCanvas.captureStream(30)
+				const getAudioStream = srcVideo.captureStream || srcVideo.mozCaptureStream;
+				if (getAudioStream) {
+					const srcStream = getAudioStream.call(srcVideo)
+					const audioTracks = srcStream.getAudioTracks()
+					
+					if (audioTracks.length > 0) {
+						finalStream = new MediaStream([
+							...canvasStream.getVideoTracks(),
+							...audioTracks
+						])
+					}
+				}
 
-		let options = { mimeType: 'video/webm; codecs=vp9' }
-		if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-		options = { mimeType: 'video/webm; codecs=vp8' }
-		}
+				const options = { mimeType: 'video/webm; codecs=vp9' }
 
-		const recorder = new MediaRecorder(stream, options)
-		const chunks = []
+				const recorder = new MediaRecorder(finalStream, options)
+				const chunks = []
 
-		recorder.ondataavailable = e => {
-		if (e.data.size > 0) chunks.push(e.data)
-		}
+				recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data) }
 
-		recorder.onstop = () => {
-		outputBlob = new Blob(chunks, { type: 'video/webm' })
-		const mb = (outputBlob.size / 1024 / 1024).toFixed(1)
+				recorder.onstop = () => {
+					outputBlob = new Blob(chunks, { type: 'video/webm' })
+					const mb = (outputBlob.size / 1024 / 1024).toFixed(2)
+					setStatus('ready', `Terminé — ${mb} Mo`)
+					setProgress(100)
+					btnDownload.disabled = false
+					btnProcess.disabled = false
+					btnClear.disabled = false
+					srcVideo.play()
+					startPreview()
+				}
 
-		setStatus('ready', `Terminé — ${mb} Mo`)
-		setProgress(100)
-		btnDownload.disabled = false
-		btnProcess.disabled = false
+				srcVideo.pause()
+				srcVideo.currentTime = 0
 
-		srcVideo.play()
-		startPreview()
-		}
+				srcVideo.onseeked = () => {
+					srcVideo.onseeked = null
+					
+					recorder.start()
+					srcVideo.play()
+					startPreview()
 
-		setStatus('working', 'Enregistrement en temps réel...')
+					const trackProgress = () => {
+						if (!srcVideo.ended && srcVideo.currentTime < dur - 0.05) {
+							const pct = Math.min(98, Math.round((srcVideo.currentTime / dur) * 100))
+							setProgress(pct)
+							stext.textContent = `Enregistrement — ${pct}%`
+							requestAnimationFrame(trackProgress)
+						} else {
+							srcVideo.pause()
+							recorder.stop()
+						}
+					}
+					trackProgress()
+				}
+			}
 
-		srcVideo.onseeked = () => {
-		srcVideo.onseeked = null
+			btnDownload.onclick = async () => {
+				if (!outputBlob || !api) return
 
-		recorder.start()
-		srcVideo.play()
-		startPreview()
-	
-		const trackProgress = () => {
-		if (!srcVideo.ended && srcVideo.currentTime < dur - 0.05) {
-        const pct = Math.min(98, Math.round((srcVideo.currentTime / dur) * 100))
-        setProgress(pct)
-        stext.textContent = `Enregistrement — ${pct}%`
-        requestAnimationFrame(trackProgress)
-      } else {
-	  
-        srcVideo.pause()
-        recorder.stop()
-      }
-    }
-    trackProgress()
-  }
+				const originalText = btnDownload.innerHTML
+				btnDownload.innerHTML = 'Enregistrement...'
+				btnDownload.disabled = true
 
-  srcVideo.pause()
-  if (srcVideo.currentTime === 0) {
-    srcVideo.onseeked()
-  } else {
-    srcVideo.currentTime = 0
-  }
-}
+				try {
+					const arrayBuffer = await outputBlob.arrayBuffer()
+					const proposedName = `${originalFileName}_chroma.webm`
+					
+					const result = await api.saveVideo(arrayBuffer, proposedName)
 
-btnDownload.onclick = async () => {
-  if (!outputBlob || !api) return
-
-  const originalText = btnDownload.innerHTML
-  btnDownload.innerHTML = 'Enregistrement...'
-  btnDownload.disabled = true
-
-  try {
-    // 1. Convertir le Blob vidéo en format binaire (ArrayBuffer)
-    const arrayBuffer = await outputBlob.arrayBuffer()
-    
-    // 2. Envoyer au système pour ouvrir la fenêtre "Enregistrer sous"
-    const result = await api.saveVideo(arrayBuffer)
-
-    if (result.success) {
-      setStatus('ready', 'Vidéo sauvegardée avec succès !')
-    }
-  } catch (err) {
-    console.error(err)
-    setStatus('', 'Erreur lors de la sauvegarde')
-  } finally {
-    // Restaurer le bouton
-    btnDownload.innerHTML = originalText
-    btnDownload.disabled = false
-  }
-}
-        </script>
+					if (result.success) {
+						setStatus('ready', 'Vidéo sauvegardée avec succès !')
+					}
+				} catch (err) {
+					console.error(err)
+					setStatus('', 'Erreur lors de la sauvegarde')
+				} finally {
+					btnDownload.innerHTML = originalText
+					btnDownload.disabled = false
+				}
+			}
+		</script>
 	</body>
 </html>
