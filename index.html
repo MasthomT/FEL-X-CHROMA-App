@@ -410,6 +410,32 @@ function startPreview() {
   }
 }
 
-		</script>
+btnDownload.onclick = async () => {
+  if (!outputBlob || !api) return
+
+  const originalText = btnDownload.innerHTML
+  btnDownload.innerHTML = 'Enregistrement...'
+  btnDownload.disabled = true
+
+  try {
+    // 1. Convertir le Blob vidéo en format binaire (ArrayBuffer)
+    const arrayBuffer = await outputBlob.arrayBuffer()
+    
+    // 2. Envoyer au système pour ouvrir la fenêtre "Enregistrer sous"
+    const result = await api.saveVideo(arrayBuffer)
+
+    if (result.success) {
+      setStatus('ready', 'Vidéo sauvegardée avec succès !')
+    }
+  } catch (err) {
+    console.error(err)
+    setStatus('', 'Erreur lors de la sauvegarde')
+  } finally {
+    // Restaurer le bouton
+    btnDownload.innerHTML = originalText
+    btnDownload.disabled = false
+  }
+}
+        </script>
 	</body>
 </html>

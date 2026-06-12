@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
+const fs = require('fs')
+// const { autoUpdater } = require('electron-updater') // À décommenter pour les MAJ auto
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -20,7 +22,23 @@ function createWindow() {
   win.loadFile('index.html')
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  createWindow()
+  // autoUpdater.checkForUpdatesAndNotify() // À décommenter pour les MAJ auto
+})
+
+/* À décommenter pour les MAJ auto
+autoUpdater.on('update-downloaded', () => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Mise à jour prête',
+    message: 'Une nouvelle version a été téléchargée. L\'application va redémarrer.',
+    buttons: ['Redémarrer maintenant']
+  }).then(() => {
+    autoUpdater.quitAndInstall()
+  })
+})
+*/
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
@@ -30,20 +48,43 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
+// -- Gestion des IPC --
 ipcMain.handle('minimize-window', () => {
   BrowserWindow.getFocusedWindow()?.minimize()
 })
+
 ipcMain.handle('maximize-window', () => {
   const win = BrowserWindow.getFocusedWindow()
   win?.isMaximized() ? win.unmaximize() : win.maximize()
 })
+
 ipcMain.handle('close-window', () => {
   BrowserWindow.getFocusedWindow()?.close()
 })
+
 ipcMain.handle('open-file-dialog', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openFile'],
     filters: [{ name: 'Vidéos', extensions: ['mp4', 'mov', 'webm', 'avi', 'mkv'] }]
   })
   return result.filePaths[0] || null
+})
+
+// -- NOUVEAU : Sauvegarde de la vidéo --
+ipcMain.handle('save-video', async (event, arrayBuffer) => {
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: 'Enregistrer la vidéo',
+    defaultPath: 'chroma-key-export.webm',
+    buttonLabel: 'Enregistrer',
+    filters: [
+      { name: 'Vidéos WebM', extensions: ['webm'] }
+    ]
+  })
+
+  if (!canceled && filePath) {
+    const buffer = Buffer.from(arrayBuffer)
+    fs.writeFileSync(filePath, buffer)
+    return { success: true, path: filePath }
+  }
+  return { success: false }
 })
